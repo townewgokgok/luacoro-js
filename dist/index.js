@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Create a new coroutine to iterate `start` first.
  *
@@ -26,9 +28,10 @@
  *
  * @param start Iterator to be started to iterate first
  */
-export function create(start) {
+function create(start) {
     return new Coroutine(start);
 }
+exports.create = create;
 /**
  * Check if the value is an iterator.
  *
@@ -43,54 +46,58 @@ function isIterator(v) {
 /**
  * The Lua-like pseudo-coroutine that wraps iterators.
  */
-export class Coroutine {
+var Coroutine = /** @class */ (function () {
     /**
      * Create a new coroutine to iterate `start` first.
      * Read `create<T>` for details.
      *
      * @param start Iterator to be started to iterate first
      */
-    constructor(start) {
+    function Coroutine(start) {
         this.waitingFrames = 0;
         this.iteratorStack = [];
         if (start) {
             this.iteratorStack.push(start);
         }
     }
-    /**
-     * Whether this coroutine is alive.
-     */
-    get isAlive() {
-        return 0 < this.iteratorStack.length;
-    }
+    Object.defineProperty(Coroutine.prototype, "isAlive", {
+        /**
+         * Whether this coroutine is alive.
+         */
+        get: function () {
+            return 0 < this.iteratorStack.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * Stop this coroutine.
      */
-    stop() {
+    Coroutine.prototype.stop = function () {
         this.iteratorStack = [];
-    }
+    };
     /**
      * Resume the current iterator and receive the yielded value at the next frame.
      * This method will return nulls forever after the coroutine stops.
      *
      * @returns The value at the next frame
      */
-    resume(resumeValue) {
-        let result = null;
+    Coroutine.prototype.resume = function (resumeValue) {
+        var result = null;
         if (--this.waitingFrames < 1) {
             if (this.iteratorStack.length === 0) {
                 return null;
             }
-            let wait = 1; // will be set waitingFrames
+            var wait = 1; // will be set waitingFrames
             while (0 < this.iteratorStack.length) {
                 // get the next value `yield`ed from the current iterator
-                const iter = this.iteratorStack[this.iteratorStack.length - 1];
-                const r = iter.next(resumeValue);
+                var iter = this.iteratorStack[this.iteratorStack.length - 1];
+                var r = iter.next(resumeValue);
                 resumeValue = undefined;
                 if (r.done) {
                     this.iteratorStack.pop();
                 }
-                let y = r.value;
+                var y = r.value;
                 if (typeof y === 'undefined') {
                     if (r.done) {
                         // bare `return` (continue the caller iterator on the stack top)
@@ -101,8 +108,8 @@ export class Coroutine {
                 }
                 if (isIterator(y)) {
                     // pause and save the current iterator and start the `yield`ed iterator
-                    const iter = y;
-                    this.iteratorStack.push(iter);
+                    var iter_1 = y;
+                    this.iteratorStack.push(iter_1);
                     continue;
                 }
                 else if (typeof y === 'number') {
@@ -130,6 +137,8 @@ export class Coroutine {
             this.waitingFrames = Math.ceil(wait);
         }
         return result;
-    }
-}
+    };
+    return Coroutine;
+}());
+exports.Coroutine = Coroutine;
 //# sourceMappingURL=index.js.map
