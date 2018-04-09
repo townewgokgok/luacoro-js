@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "out",
+    "noImplicitAny": true,
+    "module": "es2015",
+    "target": "es2015",
+    "lib": ["dom", "es2015"],
+    "sourceMap": true,
+    "removeComments": false
+  },
+  "include": [
+    "./src/**/*.ts"
+  ]
+}

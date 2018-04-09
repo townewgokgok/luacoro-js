@@ -1,5 +1,6 @@
 /dist/
 /doc/
+/examples/out/
 
 # Created by https://www.gitignore.io/api/osx,windows,code,node
 
