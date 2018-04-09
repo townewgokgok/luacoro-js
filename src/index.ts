@@ -147,6 +147,13 @@ export class Coroutine<T> {
 
 }
 
+/**
+ * Create a new coroutine to iterate all `iterators`
+ * concurrently until the all of them are dead.
+ *
+ * @param iterators Iterators
+ * @returns Composed coroutine
+ */
 export function all<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
   return new Coroutine(function* (coros: Coroutine<T>[]): Iterator<T[]> {
     while (true) {
@@ -166,6 +173,13 @@ export function all<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
   }(iterators.map(i => new Coroutine(i))))
 }
 
+/**
+ * Create a new coroutine to iterate all `iterators`
+ * concurrently until one of them is dead.
+ *
+ * @param iterators Iterators
+ * @returns Composed coroutine
+ */
 export function race<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
   return new Coroutine(function* (coros: Coroutine<T>[]): Iterator<T[]> {
     while (true) {
@@ -185,6 +199,13 @@ export function race<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
   }(iterators.map(i => new Coroutine(i))))
 }
 
+/**
+ * Create a new coroutine that repeats
+ * generating iterator and iterating it forever.
+ *
+ * @param generator Generator
+ * @returns Composed coroutine
+ */
 export function forever<T> (generator: () => Iterator<T>): Coroutine<T> {
   return new Coroutine(function* (): Iterator<T> {
     let coro
