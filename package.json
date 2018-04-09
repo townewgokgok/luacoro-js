@@ -1,0 +1,28 @@
+{
+  "name": "luacoro",
+  "version": "1.0.0",
+  "description": "Lua-like coroutine for JavaScript using generator",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "lint": "./node_modules/.bin/tslint -c tslint.json 'src/**/*.ts'",
+    "doc": "./node_modules/.bin/typedoc --out doc --exclude '**/*+(spec).ts' --excludeNotExported",
+    "test": "./node_modules/.bin/karma start"
+  },
+  "author": "townewgokgok <townewgokgok@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jasmine": "^2.8.6",
+    "jasmine-core": "^3.1.0",
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.1.1",
+    "karma-typescript": "^3.0.12",
+    "tslint": "^5.9.1",
+    "tslint-config-standard": "^7.0.0",
+    "typedoc": "^0.11.1",
+    "typescript": "^2.8.1"
+  }
+}
