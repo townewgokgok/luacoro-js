@@ -2,12 +2,14 @@
   "name": "luacoro-js-examples",
   "version": "1.0.0",
   "scripts": {
-    "build": "webpack"
+    "build": "./node_modules/.bin/webpack"
   },
   "author": "townewgokgok <townewgokgok@gmail.com>",
   "license": "MIT",
+  "dependencies": {
+    "luacoro": "file:.."
+  },
   "devDependencies": {
-    "luacoro": "file:..",
     "ts-loader": "^4.2.0",
     "webpack": "^4.5.0",
     "webpack-cli": "^2.0.14"
