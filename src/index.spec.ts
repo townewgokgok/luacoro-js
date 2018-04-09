@@ -139,3 +139,26 @@ describe('Coroutine created by "race"', () => {
   })
 
 })
+
+describe('Coroutine created by "forever"', () => {
+
+  it('runs forever', () => {
+    const c = luacoro.forever(function* (): Iterator<string> {
+      yield '1'
+      yield '2'
+    })
+    const actual = []
+    for (let i = 0; i < 10; i++) {
+      actual.push(c.resume())
+    }
+    expect(actual.join('')).toEqual('1212121212')
+  })
+
+  it('is prevented from the infinite loop without yielding', () => {
+    const c = luacoro.forever(function* (): Iterator<string> {
+      return
+    })
+    expect(c.resume()).toBeNull()
+  })
+
+})

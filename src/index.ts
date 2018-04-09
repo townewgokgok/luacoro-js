@@ -184,3 +184,21 @@ export function race<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
     }
   }(iterators.map(i => new Coroutine(i))))
 }
+
+export function forever<T> (generator: () => Iterator<T>): Coroutine<T> {
+  return new Coroutine(function* (): Iterator<T> {
+    let coro
+    while (true) {
+      let isNew = false
+      if (!(coro && coro.isAlive)) {
+        coro = new Coroutine(generator())
+        isNew = true
+      }
+      const v = coro.resume()
+      if (!coro.isAlive && v == null && !isNew) {
+        continue
+      }
+      yield v
+    }
+  }())
+}

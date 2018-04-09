@@ -226,4 +226,30 @@ function race(iterators) {
     }(iterators.map(function (i) { return new Coroutine(i); })));
 }
 exports.race = race;
+function forever(generator) {
+    return new Coroutine(function () {
+        var coro, isNew, v;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!true) return [3 /*break*/, 2];
+                    isNew = false;
+                    if (!(coro && coro.isAlive)) {
+                        coro = new Coroutine(generator());
+                        isNew = true;
+                    }
+                    v = coro.resume();
+                    if (!coro.isAlive && v == null && !isNew) {
+                        return [3 /*break*/, 0];
+                    }
+                    return [4 /*yield*/, v];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 0];
+                case 2: return [2 /*return*/];
+            }
+        });
+    }());
+}
+exports.forever = forever;
 //# sourceMappingURL=index.js.map
