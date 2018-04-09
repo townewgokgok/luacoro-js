@@ -35,9 +35,8 @@ const eps = 2.0
 
 function* koch (v: Vector): luacoro.Iterator<Vector> {
   if (v.size() <= eps) {
-    // different from `return v`, be careful
-    yield v
-    return
+    yield v // resume() returns v and wait 1 frame (different from `return v`, be careful)
+    return // back to the caller iterator
   }
   const t = v.mul(1.0 / 3.0)
                                        // ＿/\＿
