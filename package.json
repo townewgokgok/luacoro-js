@@ -1,6 +1,6 @@
 {
   "name": "luacoro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lua-like coroutine for JavaScript using generator",
   "keywords": [
     "coroutine",
