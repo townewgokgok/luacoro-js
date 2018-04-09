@@ -2,6 +2,18 @@
   "name": "luacoro",
   "version": "1.0.0",
   "description": "Lua-like coroutine for JavaScript using generator",
+  "keywords": [
+    "coroutine",
+    "generator",
+    "iterator",
+    "lua",
+    "game",
+    "web"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/townewgokgok/luacoro-js.git"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
