@@ -98,3 +98,44 @@ describe('Coroutine', () => {
   })
 
 })
+
+const generators = [
+  function* (): Iterator<string> {
+    yield 'a'
+    return 'b'
+  },
+  function* (): Iterator<string> {
+    yield 'A'
+    yield 'B'
+    return 'C'
+  },
+  function* (): Iterator<string> {
+    return '1'
+  }
+]
+
+describe('Coroutine created by "all"', () => {
+
+  it('runs until the all iterators are dead', () => {
+    const c = luacoro.all(generators.map(g => g()))
+    const actual = []
+    while (c.isAlive) {
+      actual.push(c.resume().map(s => s || '-').join(''))
+    }
+    expect(actual.join(' ')).toEqual('aA1 bB- -C-')
+  })
+
+})
+
+describe('Coroutine created by "race"', () => {
+
+  it('runs until one of the iterators is dead', () => {
+    const c = luacoro.race(generators.map(g => g()))
+    const actual = []
+    while (c.isAlive) {
+      actual.push(c.resume().map(s => s || '-').join(''))
+    }
+    expect(actual.join(' ')).toEqual('aA1')
+  })
+
+})

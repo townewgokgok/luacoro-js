@@ -65,3 +65,5 @@ export declare class Coroutine<T> {
      */
     resume(resumeValue?: T): T;
 }
+export declare function all<T>(iterators: Iterator<T>[]): Coroutine<T[]>;
+export declare function race<T>(iterators: Iterator<T>[]): Coroutine<T[]>;

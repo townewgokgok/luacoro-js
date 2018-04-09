@@ -146,3 +146,41 @@ export class Coroutine<T> {
   }
 
 }
+
+export function all<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
+  return new Coroutine(function* (coros: Coroutine<T>[]): Iterator<T[]> {
+    while (true) {
+      let isAlive = false
+      const result = []
+      for (let coro of coros) {
+        result.push(coro.resume())
+        if (coro.isAlive) {
+          isAlive = true
+        }
+      }
+      if (!isAlive) {
+        return result
+      }
+      yield result
+    }
+  }(iterators.map(i => new Coroutine(i))))
+}
+
+export function race<T> (iterators: Iterator<T>[]): Coroutine<T[]> {
+  return new Coroutine(function* (coros: Coroutine<T>[]): Iterator<T[]> {
+    while (true) {
+      let isAlive = true
+      const result = []
+      for (let coro of coros) {
+        result.push(coro.resume())
+        if (!coro.isAlive) {
+          isAlive = false
+        }
+      }
+      if (!isAlive) {
+        return result
+      }
+      yield result
+    }
+  }(iterators.map(i => new Coroutine(i))))
+}
