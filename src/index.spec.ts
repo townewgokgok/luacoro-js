@@ -117,7 +117,7 @@ const generators = [
 describe('Coroutine created by "all"', () => {
 
   it('runs until the all iterators are dead', () => {
-    const c = luacoro.all(generators.map(g => g()))
+    const c = luacoro.all(generators.map(g => luacoro.create(g())))
     const actual = []
     while (c.isAlive) {
       actual.push(c.resume().map(s => s || '-').join(''))
@@ -130,7 +130,7 @@ describe('Coroutine created by "all"', () => {
 describe('Coroutine created by "race"', () => {
 
   it('runs until one of the iterators is dead', () => {
-    const c = luacoro.race(generators.map(g => g()))
+    const c = luacoro.race(generators.map(g => luacoro.create(g())))
     const actual = []
     while (c.isAlive) {
       actual.push(c.resume().map(s => s || '-').join(''))
