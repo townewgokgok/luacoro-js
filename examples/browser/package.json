@@ -7,7 +7,7 @@
   "author": "townewgokgok <townewgokgok@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "luacoro": "file:.."
+    "luacoro": "file:../.."
   },
   "devDependencies": {
     "ts-loader": "^4.2.0",
