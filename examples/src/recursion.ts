@@ -14,21 +14,16 @@ function* koch (v: Vector): luacoro.Iterator<Vector> {
   yield koch(t)                        // ＿
   yield koch(t.rotate(-Math.PI / 3.0)) //   /
   yield koch(t.rotate(Math.PI / 3.0))  //    \
-  return koch(t)                       //     ＿
+  yield koch(t)                        //     ＿
+  // back to the caller iterator
 }
 
-function start () {
-  const main = document.getElementById('main') as HTMLMainElement
-  main.innerHTML = ''
+export default function start () {
+  const info = document.getElementById('recursion-info') as HTMLDivElement
 
-  const info = document.createElement('div') as HTMLDivElement
-  info.style.fontFamily = 'monospace'
-  main.appendChild(info)
-
-  const canvas = document.createElement('canvas') as HTMLCanvasElement
+  const canvas = document.getElementById('recursion-canvas') as HTMLCanvasElement
   canvas.width = size
   canvas.height = size
-  main.appendChild(canvas)
 
   const ctx = canvas.getContext('2d')
   ctx.fillStyle = '#eeeeee'
@@ -52,8 +47,10 @@ function start () {
 
   function update () {
     const v = coro.resume()
-    drawLine(pos, pos.add(v))
-    pos = pos.add(v)
+    if (v) {
+      drawLine(pos, pos.add(v))
+      pos = pos.add(v)
+    }
     if (coro.isAlive) {
       requestAnimationFrame(update)
     }
@@ -61,8 +58,3 @@ function start () {
 
   requestAnimationFrame(update)
 }
-
-const button = document.createElement('button') as HTMLButtonElement
-button.textContent = 'recursion'
-document.getElementById('buttons').appendChild(button)
-button.addEventListener('click', e => start())

@@ -34,12 +34,12 @@ class Sprite {
     yield this.move(topRight) // To go to another iterator and come back, just yield it
     yield this.move(bottomRight)
     yield this.move(bottomLeft)
-    return this.move(topLeft)
+    yield this.move(topLeft)
   }
 
   *backAndForth (): luacoro.Iterator<{}> {
     yield this.move(bottomRight)
-    return this.move(topLeft)
+    yield this.move(topLeft)
   }
 
   repaint (ctx: CanvasRenderingContext2D) {
@@ -51,14 +51,10 @@ class Sprite {
 const redSprite = new Sprite('red', topLeft)
 const blueSprite = new Sprite('blue', topLeft)
 
-function start () {
-  const main = document.getElementById('main') as HTMLMainElement
-  main.innerHTML = ''
-
-  const canvas = document.createElement('canvas') as HTMLCanvasElement
+export default function start () {
+  const canvas = document.getElementById('concurrent-canvas') as HTMLCanvasElement
   canvas.width = size
   canvas.height = size
-  main.appendChild(canvas)
 
   function repaint () {
     const ctx = canvas.getContext('2d')
@@ -81,8 +77,3 @@ function start () {
 
   requestAnimationFrame(update)
 }
-
-const button = document.createElement('button') as HTMLButtonElement
-button.textContent = 'concurrent'
-document.getElementById('buttons').appendChild(button)
-button.addEventListener('click', e => start())

@@ -3,11 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <title>luacoro-js examples</title>
+    <style type="text/css">
+      body {
+        font-family: monospace;
+      }
+      .example {
+        display: none;
+      }
+      #basic-textarea {
+        width: 21em;
+        height: 10em;
+      }
+    </style>
   </head>
   <body>
     <div id="buttons"></div>
     <br/>
-    <main id="main"></main>
+    <div class="example" id="basic">
+      <textarea id="basic-textarea"></textarea>
+    </div>
+    <div class="example" id="concurrent">
+      <canvas id="concurrent-canvas"></canvas>
+    </div>
+    <div class="example" id="recursion">
+      <div id="recursion-info"></div>
+      <canvas id="recursion-canvas"></canvas>
+    </div>
     <script src="out/bundle.js"></script>
   </body>
 </html>
