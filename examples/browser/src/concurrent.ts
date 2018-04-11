@@ -48,13 +48,15 @@ class Sprite {
   }
 }
 
-const redSprite = new Sprite('red', topLeft)
-const blueSprite = new Sprite('blue', topLeft)
+let request: number = null
 
-export default function start () {
+export function start () {
   const canvas = document.getElementById('concurrent-canvas') as HTMLCanvasElement
   canvas.width = size
   canvas.height = size
+
+  const redSprite = new Sprite('red', topLeft)
+  const blueSprite = new Sprite('blue', topLeft)
 
   function repaint () {
     const ctx = canvas.getContext('2d')
@@ -72,8 +74,13 @@ export default function start () {
   function update () {
     coro.resume()
     repaint()
-    requestAnimationFrame(update)
+    request = requestAnimationFrame(update)
   }
 
-  requestAnimationFrame(update)
+  request = requestAnimationFrame(update)
+}
+
+export function stop () {
+  if (request) cancelAnimationFrame(request)
+  request = null
 }

@@ -18,7 +18,9 @@ function* koch (v: Vector): luacoro.Iterator<Vector> {
   // back to the caller iterator
 }
 
-export default function start () {
+let request: number = null
+
+export function start () {
   const info = document.getElementById('recursion-info') as HTMLDivElement
 
   const canvas = document.getElementById('recursion-canvas') as HTMLCanvasElement
@@ -46,15 +48,22 @@ export default function start () {
   const coro = luacoro.create(koch(vec))
 
   function update () {
+    request = null
+
     const v = coro.resume()
     if (v) {
       drawLine(pos, pos.add(v))
       pos = pos.add(v)
     }
     if (coro.isAlive) {
-      requestAnimationFrame(update)
+      request = requestAnimationFrame(update)
     }
   }
 
-  requestAnimationFrame(update)
+  request = requestAnimationFrame(update)
+}
+
+export function stop () {
+  if (request) cancelAnimationFrame(request)
+  request = null
 }
