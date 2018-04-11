@@ -5,8 +5,8 @@
 [![Dependency Status][dependencies-image]][dependencies-url]
 [![MIT License][license-image]][license-url]
 
-[npm-image]: https://img.shields.io/npm/v/luacoro.svg
-[npm-url]: https://npmjs.com/package/luacoro
+[npm-image]: https://badge.fury.io/js/luacoro.svg
+[npm-url]: https://badge.fury.io/js/luacoro
 
 [travisci-image]: https://travis-ci.org/townewgokgok/luacoro-js.svg?branch=master
 [travisci-url]: https://travis-ci.org/townewgokgok/luacoro-js
