@@ -2,7 +2,8 @@
   "name": "luacoro-js-examples",
   "version": "1.2.0",
   "scripts": {
-    "start": "./node_modules/.bin/parcel index.html"
+    "start": "./node_modules/.bin/parcel index.html",
+    "build": "rm -Rf dist && ./node_modules/.bin/parcel build --public-url 'https://townewgokgok.github.io/luacoro-js/' index.html"
   },
   "author": "townewgokgok <townewgokgok@gmail.com>",
   "license": "MIT",
