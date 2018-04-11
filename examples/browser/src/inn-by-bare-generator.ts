@@ -1,5 +1,3 @@
-import * as luacoro from 'luacoro'
-
 ///////////////////////////////////////////////////////////////////////////
 // Main game system and API implementations
 
@@ -40,7 +38,7 @@ export function start () {
   waitingFrames = 0
   document.getElementById('inn').innerHTML = ''
 
-  let coro = luacoro.create(inn())
+  let iter = inn()
   let frame = 0
 
   function update () {
@@ -82,11 +80,11 @@ export function start () {
         break
 
       default:
-        r = coro.resume()
-        if (r) mode = r
+        r = iter.next()
+        if (r.value) mode = r.value
     }
     frame++
-    if (coro.isAlive) {
+    if (!(r && r.done)) {
       request = requestAnimationFrame(update)
     }
   }
@@ -100,50 +98,31 @@ export function stop () {
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// Helpers
-
-function* waitKey (keys?: string[]): luacoro.Iterator<string> {
-  limitKeys = keys
-  yield 'waitKey'
-  return lastKey
-}
-
-function* waitFrame (f: number): luacoro.Iterator<string> {
-  waitingFrames = f
-  yield 'waitFrame'
-}
-
-function* waitFadeOut (): luacoro.Iterator<string> {
-  yield 'waitFadeOut'
-}
-
-function* waitFadeIn (): luacoro.Iterator<string> {
-  yield 'waitFadeIn'
-}
-
-///////////////////////////////////////////////////////////////////////////
 // Scenario implementations
 
-function* inn (): luacoro.Iterator<string> {
+function* inn () {
   message('Welcome to the traveler\'s Inn.')
   message('Room and board is 6 GOLD per night.')
   message('Dost thou want a room? (Y/N)')
-  const key = yield waitKey(['y', 'n'])
+  limitKeys = ['y', 'n']
+  yield 'waitKey'
 
-  if (key === 'y') {
+  if (lastKey === 'y') {
     message('Good night.')
-    yield waitFrame(30)
-    yield waitFadeOut()
-    yield waitFrame(30)
+    waitingFrames = 30
+    yield 'waitFrame'
+    yield 'waitFadeOut'
+    waitingFrames = 30
+    yield 'waitFrame'
     // player.money -= 6
     // player.hp = player.maxHP
     // player.mp = player.maxMP
-    yield waitFadeIn()
+    yield 'waitFadeIn'
     message('Good morning.')
     message('Thou hast had a good night\'s sleep I hope.')
-    yield waitKey()
+    yield 'waitKey'
   }
 
   message('I shall see thee again.')
-  yield waitKey()
+  yield 'waitKey'
 }
