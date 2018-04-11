@@ -52,7 +52,7 @@ const luacoro = require('luacoro')
 
 ### Basic
 
-Source: [examples/src/basic.ts](./examples/src/basic.ts)
+Source: [examples/browser/src/basic.ts](./examples/browser/src/basic.ts)
 
 ```typescript
 const textarea = document.getElementById('basic-textarea') as HTMLTextAreaElement
@@ -118,7 +118,7 @@ requestAnimationFrame(update)
 
 ### Concurrent
 
-Source: [examples/src/concurrent.ts](./examples/src/concurrent.ts)
+Source: [examples/browser/src/concurrent.ts](./examples/browser/src/concurrent.ts)
 
 ```typescript
 const absoluteVelocity = 3
@@ -173,7 +173,7 @@ requestAnimationFrame(update)
 
 ### Recursion
 
-Source: [examples/src/recursion.ts](./examples/src/recursion.ts)
+Source: [examples/browser/src/recursion.ts](./examples/browser/src/recursion.ts)
 
 ```typescript
 const eps = 2.0
