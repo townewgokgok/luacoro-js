@@ -1,6 +1,12 @@
 # luacoro-js
 
-[![Build Status][travisci-image]][travisci-url] [![Dependency Status][dependencies-image]][dependencies-url] [![MIT License][license-image]][license-url]
+[![Build Status][travisci-image]][travisci-url]
+[![npm][npm-image]][npm-url]
+[![Dependency Status][dependencies-image]][dependencies-url]
+[![MIT License][license-image]][license-url]
+
+[npm-image]: https://img.shields.io/npm/v/luacoro.svg
+[npm-url]: https://npmjs.com/package/luacoro
 
 [travisci-image]: https://travis-ci.org/townewgokgok/luacoro-js.svg?branch=master
 [travisci-url]: https://travis-ci.org/townewgokgok/luacoro-js
