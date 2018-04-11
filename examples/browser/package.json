@@ -1,8 +1,8 @@
 {
   "name": "luacoro-js-examples",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "scripts": {
-    "build": "./node_modules/.bin/webpack"
+    "start": "./node_modules/.bin/parcel index.html"
   },
   "author": "townewgokgok <townewgokgok@gmail.com>",
   "license": "MIT",
@@ -10,9 +10,7 @@
     "luacoro": "file:../.."
   },
   "devDependencies": {
-    "ts-loader": "^4.2.0",
-    "typescript": "^2.8.1",
-    "webpack": "^4.5.0",
-    "webpack-cli": "^2.0.14"
+    "parcel-bundler": "^1.7.0",
+    "typescript": "^2.8.1"
   }
 }
