@@ -18,7 +18,7 @@
 [license-url]: https://opensource.org/licenses/MIT
 
 Lua-like pseudo-coroutine for JavaScript using generator.
-[Demos](https://townewgokgok.github.io/luacoro-js/)
+[Demo](https://townewgokgok.github.io/luacoro-js/)
 
 TOC
 
@@ -57,6 +57,8 @@ const luacoro = require('luacoro')
 ```
 
 ## Examples
+
+Compare these with the [demo](https://townewgokgok.github.io/luacoro-js/)
 
 ### Basic
 
