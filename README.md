@@ -39,6 +39,7 @@ TOC
     - [Method `resume`](#method-resume)
     - [Method `stop`](#method-stop)
     - [Accessor `isAlive`](#accessor-isalive)
+- [Error handling](#error-handling)
 - [Todo](#todo)
 
 <!-- /TOC -->
@@ -331,7 +332,34 @@ get isAlive(): boolean
 
 Whether this coroutine is alive.
 
+## Error handling
+
+See [src/index.spec.ts](./src/index.spec.ts#L100-L120)
+
+```typescript
+it('handles exception', () => {
+  let result = ''
+  function* second (): luacoro.Iterator<{}> {
+    throw new Error('error')
+  }
+  function* first (): luacoro.Iterator<{}> {
+    try {
+      yield second()
+    } catch (e) {
+      result += 'caught '
+    }
+    yield second()
+  }
+  const c = luacoro.create(first())
+  try {
+    c.resume()
+  } catch (e) {
+    result += e.message
+  }
+  expect(result).toEqual('caught error')
+})
+```
+
 ## Todo
 
-- Error handling
 - Golang-like `defer`

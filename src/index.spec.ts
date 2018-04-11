@@ -97,6 +97,28 @@ describe('Coroutine', () => {
     expect(actual).toEqual('abc')
   })
 
+  it('handles exception', () => {
+    let result = ''
+    function* second (): luacoro.Iterator<{}> {
+      throw new Error('error')
+    }
+    function* first (): luacoro.Iterator<{}> {
+      try {
+        yield second()
+      } catch (e) {
+        result += 'caught '
+      }
+      yield second()
+    }
+    const c = luacoro.create(first())
+    try {
+      c.resume()
+    } catch (e) {
+      result += e.message
+    }
+    expect(result).toEqual('caught error')
+  })
+
 })
 
 const generators = [

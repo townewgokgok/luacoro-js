@@ -12,7 +12,9 @@ module.exports = function(config) {
     },
 
     karmaTypescriptConfig: {
+      exclude: ['examples/**/*'],
       compilerOptions: {
+        sourceMap: true,
         lib: tsconfig.compilerOptions.lib
       }
     },

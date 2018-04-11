@@ -65,10 +65,33 @@ export class Coroutine<T> {
     if (--this.waitingFrames < 1) {
       if (this.iteratorStack.length === 0) { return null }
       let wait = 1 // will be set waitingFrames
+      let exception: any
       while (0 < this.iteratorStack.length) {
         // get the next value `yield`ed from the current iterator
-        const iter = this.iteratorStack[this.iteratorStack.length - 1]
-        const r = iter.next(resumeValue)
+        let iter = this.iteratorStack[this.iteratorStack.length - 1]
+        let r: IteratorResult<T | number | Iterator<T>> = null
+        let ex: any = null
+        try {
+          if (exception != null) {
+            if (!iter.throw) {
+              throw exception
+            }
+            r = iter.throw(exception)
+          } else {
+            r = iter.next(resumeValue)
+          }
+        } catch (e) {
+          ex = e
+        }
+        exception = null
+        if (ex) {
+          this.iteratorStack.pop()
+          if (this.iteratorStack.length === 0) {
+            throw ex
+          }
+          exception = ex
+          continue
+        }
         resumeValue = undefined
         if (r.done) {
           this.iteratorStack.pop()
