@@ -1,6 +1,6 @@
 {
   "name": "luacoro",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Lua-like pseudo-coroutine that wraps iterators.",
   "keywords": [
     "coroutine",
