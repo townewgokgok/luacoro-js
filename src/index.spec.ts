@@ -97,11 +97,13 @@ describe('Coroutine', () => {
     expect(actual).toEqual('abc')
   })
 
-  it('handles exception', () => {
+  it('handles error', () => {
     let result = ''
+
     function* second (): luacoro.Iterator<{}> {
-      throw new Error('error')
+      throw new Error('an error')
     }
+
     function* first (): luacoro.Iterator<{}> {
       try {
         yield second()
@@ -110,13 +112,14 @@ describe('Coroutine', () => {
       }
       yield second()
     }
+
     const c = luacoro.create(first())
     try {
       c.resume()
     } catch (e) {
       result += e.message
     }
-    expect(result).toEqual('caught error')
+    expect(result).toEqual('caught an error')
   })
 
 })
@@ -205,10 +208,12 @@ describe('Defer', () => {
   function* test () {
     const result = []
     yield main(0, result)
+    yield result.join(' ')
     result.push('|')
     try {
       yield main(1, result)
     } catch (e) {
+      yield result.join(' ')
       result.push('|')
     }
     yield main(2, result)
@@ -217,10 +222,12 @@ describe('Defer', () => {
 
   it('works', () => {
     const c = luacoro.create(test())
+    expect(c.resume()).toEqual('1 d1')
+    expect(c.resume()).toEqual('1 d1 | 1 s sd d1')
     expect(c.resume()).toEqual('1 d1 | 1 s sd d1 | 1 s sd 2 d2 d1')
   })
 
-  it('handles exception', () => {
+  it('handles error', () => {
     const c = luacoro.create(function* () {
       luacoro.defer(() => {
         throw new Error('error overridden by defer')

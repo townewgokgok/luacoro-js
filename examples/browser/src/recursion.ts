@@ -6,8 +6,9 @@ const size = 300
 
 function* koch (v: Vector): luacoro.Iterator<Vector> {
   if (v.size() <= eps) {
-    yield v // resume() returns v and wait 1 frame (different from `return v`, be careful)
-    return // back to the caller iterator
+    yield v // resume() returns v and wait 1 frame
+            // (different from `return v`, be careful)
+    return // back to the caller iterator (with no return value)
   }
   const t = v.mul(1.0 / 3.0)
                                        // ＿/\＿
@@ -15,7 +16,7 @@ function* koch (v: Vector): luacoro.Iterator<Vector> {
   yield koch(t.rotate(-Math.PI / 3.0)) //   /
   yield koch(t.rotate(Math.PI / 3.0))  //    \
   yield koch(t)                        //     ＿
-  // back to the caller iterator
+  // back to the caller iterator (with no return value)
 }
 
 let request: number = null
