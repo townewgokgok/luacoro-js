@@ -184,3 +184,56 @@ describe('Coroutine created by "forever"', () => {
   })
 
 })
+
+describe('Defer', () => {
+
+  function* sub (out: string[]) {
+    luacoro.defer(() => out.push('sd'))
+    out.push('s')
+  }
+
+  function* main (i: number, out: string[]) {
+    luacoro.defer(() => out.push('d1'))
+    out.push('1')
+    if (i === 0) return
+    yield sub(out)
+    if (i === 1) throw new Error('error')
+    luacoro.defer(() => out.push('d2'))
+    out.push('2')
+  }
+
+  function* test () {
+    const result = []
+    yield main(0, result)
+    result.push('|')
+    try {
+      yield main(1, result)
+    } catch (e) {
+      result.push('|')
+    }
+    yield main(2, result)
+    return result.join(' ')
+  }
+
+  it('works', () => {
+    const c = luacoro.create(test())
+    expect(c.resume()).toEqual('1 d1 | 1 s sd d1 | 1 s sd 2 d2 d1')
+  })
+
+  it('handles exception', () => {
+    const c = luacoro.create(function* () {
+      luacoro.defer(() => {
+        throw new Error('error overridden by defer')
+      })
+      throw new Error('error')
+    })
+    let result = ''
+    try {
+      c.resume()
+    } catch (e) {
+      result = e.message
+    }
+    expect(result).toEqual('error overridden by defer')
+  })
+
+})

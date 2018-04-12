@@ -18,12 +18,19 @@ function isIterator (v: any): boolean {
   return 'next' in v && typeof v.next === 'function'
 }
 
+let runningCoroutine: any = null
+
+interface StackFrame<T> {
+  iterator: Iterator<T>
+  deferFns: (() => void)[]
+}
+
 /**
  * The Lua-like pseudo-coroutine that wraps iterators.
  */
 export class Coroutine<T> {
 
-  private iteratorStack: Iterator<T>[]
+  private iteratorStack: StackFrame<T>[]
   private waitingFrames: number
 
   /**
@@ -36,7 +43,7 @@ export class Coroutine<T> {
     this.waitingFrames = 0
     this.iteratorStack = []
     if (start) {
-      this.iteratorStack.push(start)
+      this.iteratorStack.push({ iterator: start, deferFns: [] })
     }
   }
 
@@ -68,33 +75,38 @@ export class Coroutine<T> {
       let exception: any
       while (0 < this.iteratorStack.length) {
         // get the next value `yield`ed from the current iterator
-        let iter = this.iteratorStack[this.iteratorStack.length - 1]
+        let frame = this.iteratorStack[this.iteratorStack.length - 1]
+        let { iterator } = frame
         let r: IteratorResult<T | number | Iterator<T>> = null
         let ex: any = null
+        runningCoroutine = this
         try {
           if (exception != null) {
-            if (!iter.throw) {
+            if (!iterator.throw) {
               throw exception
             }
-            r = iter.throw(exception)
+            r = iterator.throw(exception)
           } else {
-            r = iter.next(resumeValue)
+            r = iterator.next(resumeValue)
           }
         } catch (e) {
           ex = e
         }
         exception = null
-        if (ex) {
-          this.iteratorStack.pop()
-          if (this.iteratorStack.length === 0) {
-            throw ex
-          }
+        runningCoroutine = null
+        if (ex != null) {
+          const e = this.popStack()
+          if (e != null) ex = e // TODO: composed error
           exception = ex
           continue
         }
         resumeValue = undefined
         if (r.done) {
-          this.iteratorStack.pop()
+          const ex = this.popStack()
+          if (ex != null) {
+            exception = ex
+            continue
+          }
         }
         let y = r.value
         if (typeof y === 'undefined') {
@@ -107,8 +119,8 @@ export class Coroutine<T> {
         }
         if (isIterator(y)) {
           // pause and save the current iterator and start the `yield`ed iterator
-          const iter = y as Iterator<T>
-          this.iteratorStack.push(iter)
+          const iterator = y as Iterator<T>
+          this.iteratorStack.push({ iterator, deferFns: [] })
           continue
         } else if (typeof y === 'number') {
           // wait `y` frames
@@ -131,11 +143,49 @@ export class Coroutine<T> {
           break
         }
       }
+      if (exception != null) {
+        throw exception
+      }
       this.waitingFrames = Math.ceil(wait)
     }
     return result
   }
 
+  private defer (fn: () => void) {
+    if (this.iteratorStack.length === 0) {
+      throw new Error('luacoro.defer() must be called from within a coroutine')
+    }
+    this.iteratorStack[this.iteratorStack.length - 1].deferFns.push(fn)
+  }
+
+  private popStack (): any {
+    if (this.iteratorStack.length === 0) return null
+    const { deferFns } = this.iteratorStack.pop()
+    let ex: any = null
+    // TODO: call all deferFns and return composed error
+    try {
+      for (let i = deferFns.length - 1; 0 <= i; i--) {
+        deferFns[i]()
+      }
+    } catch (e) {
+      ex = e
+    }
+    return ex
+  }
+
+}
+
+/**
+ * Register `fn` to be invoked when exiting the caller iterator.
+ * Works like [Golang's defer](https://golang.org/ref/spec#Defer_statements).
+ *
+ * @param fn Callback
+ */
+export function defer (fn: () => void) {
+  if (!runningCoroutine) {
+    throw new Error('luacoro.defer() must be called from within a coroutine')
+  }
+  runningCoroutine.defer(fn)
 }
 
 /**
