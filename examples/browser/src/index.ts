@@ -27,11 +27,14 @@ for (let name in examples) {
   buttons.appendChild(button)
   button.addEventListener('click', function (button: HTMLButtonElement, name: string) {
     button.blur()
-    window.location.hash = '#' + name
+    startDemo(name)
   }.bind(null, button, name))
 }
 
 function startDemo (name: string) {
+  if (window.location.hash.length < 2 || window.location.hash.substr(1) !== name) {
+    window.location.hash = '#' + name
+  }
   const demo = examples[name]
   const divs = document.getElementsByClassName('example')
   for (let i = 0; i < divs.length; i++) {

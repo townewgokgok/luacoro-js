@@ -41,15 +41,15 @@ document.getElementById('guide-form-color-r').addEventListener('input', updateBg
 document.getElementById('guide-form-color-g').addEventListener('input', updateBgColor)
 document.getElementById('guide-form-color-b').addEventListener('input', updateBgColor)
 
-function showSettingsDialog () {
+function showDialog () {
   document.getElementById('guide-dialog').style.display = 'block'
 }
-document.getElementById('guide-open').addEventListener('click', showSettingsDialog)
+document.getElementById('guide-open').addEventListener('click', showDialog)
 
-function hideSettingsDialog () {
+function hideDialog () {
   document.getElementById('guide-dialog').style.display = 'none'
 }
-document.getElementById('guide-form-ok').addEventListener('click', hideSettingsDialog)
+document.getElementById('guide-form-ok').addEventListener('click', hideDialog)
 
 ///////////////////////////////////////////////////////////////////////////
 // Helpers
@@ -58,10 +58,15 @@ function showCursor () {
   document.getElementById('guide-cursor').style.display = 'block'
 }
 
+function hideCursor () {
+  document.getElementById('guide-cursor').style.display = 'none'
+}
+
 function reset () {
   document.getElementById('guide-message').style.display = 'none'
-  document.getElementById('guide-cursor').style.display = 'none'
-  document.getElementById('guide-dialog').style.display = 'none'
+  hideDialog()
+  hideCursor()
+  disableBlocker()
 }
 
 function updateHover (p: Vector, isFocused: boolean) {
@@ -130,6 +135,16 @@ function message (msg: string) {
   e.style.display = 'block'
 }
 
+function enableBlocker () {
+  const e = document.getElementById('guide-blocker') as HTMLDivElement
+  e.style.display = 'block'
+}
+
+function disableBlocker () {
+  const e = document.getElementById('guide-blocker') as HTMLDivElement
+  e.style.display = 'none'
+}
+
 function easingIn (v: number): number {
   return v * v * v
 }
@@ -146,13 +161,22 @@ function easingInOut (v: number): number {
 ///////////////////////////////////////////////////////////////////////////
 // Guide implementations
 
+// const waitFrames = 3
+// const longWaitFrames = 12
+// const baseMoveFrames = 1
+// const moveFramesPerDistance = .01
+// const beforeTypeFrames = 2
+// const typeFrames = 1
+
 const waitFrames = 30
 const longWaitFrames = 120
 const baseMoveFrames = 15
 const moveFramesPerDistance = .15
 const beforeTypeFrames = 20
 const typeFrames = 4
+
 const clickEffectFrames = 30
+
 const exampleTitles = [
   'JavaScript tutorial',
   'My diary'
@@ -166,14 +190,17 @@ let trial = 0
 function *moveTo (to: Vector, fn?: (r: number, p: Vector) => void): luacoro.Iterator<{}> {
   const from = lastCursorPos.clone()
   const distance = to.sub(from).size()
-  const frames = baseMoveFrames + distance * moveFramesPerDistance
-  for (let i = 0; i < frames; i++) {
+  const frames = Math.ceil(baseMoveFrames + distance * moveFramesPerDistance)
+  for (let i = 1; i < frames; i++) {
     const r = easingInOut(i / (frames - 1))
     const p = from.lerp(to, r)
     setCursorPos(p)
     if (fn) fn(r, p)
     yield // wait 1 frame
   }
+  setCursorPos(to)
+  if (fn) fn(1.0, to)
+  yield // wait 1 frame
 }
 
 function *moveSlider (id: string, valueTo: number, fn: () => void) {
@@ -216,8 +243,21 @@ function addClickEffect () {
   })
 }
 
+function* waitDialogShown (): luacoro.Iterator<{}> {
+  while (document.getElementById('guide-dialog').style.display === 'none') {
+    yield
+  }
+}
+
+function* waitDialogHidden (): luacoro.Iterator<{}> {
+  while (document.getElementById('guide-dialog').style.display !== 'none') {
+    yield
+  }
+}
+
 function* guide (): luacoro.Iterator<{}> {
   reset()
+  enableBlocker()
   setCursorPos(getElementPos('guide'))
   showCursor()
   yield waitFrames
@@ -227,7 +267,7 @@ function* guide (): luacoro.Iterator<{}> {
   yield moveTo(getElementPos('guide-open'))
   yield waitFrames
   addClickEffect()
-  showSettingsDialog()
+  showDialog()
   message('The settings dialog is appeared.')
   yield longWaitFrames
 
@@ -254,7 +294,18 @@ function* guide (): luacoro.Iterator<{}> {
   yield moveTo(getElementPos('guide-form-ok'))
   yield waitFrames
   addClickEffect()
-  hideSettingsDialog()
+  hideDialog()
+  yield longWaitFrames
+
+  hideCursor()
+  disableBlocker()
+  message('Your turn now. Click the gear icon.')
+  yield waitDialogShown()
+
+  message('Good. Cutomize your own blog and click "OK" button.')
+  yield waitDialogHidden()
+
+  message('Excellent! This is the end of this tutorial.')
   yield longWaitFrames
 
   reset()
