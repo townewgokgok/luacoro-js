@@ -151,6 +151,10 @@ export class Coroutine<T> {
     return result
   }
 
+  protected pushIterator (iter?: Iterator<T>) {
+    this.iteratorStack.push({ iterator: iter, deferFns: [] })
+  }
+
   private defer (fn: () => void) {
     if (this.iteratorStack.length === 0) {
       throw new Error('luacoro.defer() must be called from within a coroutine')
@@ -239,29 +243,85 @@ export function create<T> (start?: Coroutinizable<T>): Coroutine<T> {
 }
 
 /**
+ * Coroutine that wraps multiple iterators and yields results in an array.
+ */
+export class ComposedCoroutine<T> extends Coroutine<T[]> {
+
+  private children: Coroutine<T>[]
+
+  /**
+   * Create a new coroutine to iterate all `coroutines`.
+   * Read `all<T>` and `race<T>` for details.
+   *
+   * @param coroutines Coroutines or iterators
+   * @param fnAlive Callback to judge this coroutine is alive or not
+   */
+  constructor (coroutines: Coroutine<T>[], fnAlive: (children: Coroutine<T>[]) => boolean) {
+    super()
+    this.children = [].concat(coroutines)
+    this.pushIterator(this.main(fnAlive))
+  }
+
+  /**
+   * Add a `coroutine` to iterate together.
+   * @param c Coroutine or iterator
+   */
+  public add (coroutine: Coroutinizable<T>) {
+    this.children.push(create(coroutine))
+  }
+
+  private *main (fnAlive: (children: Coroutine<T>[]) => boolean): Iterator<T[]> {
+    while (true) {
+      const result = []
+      for (let coro of [].concat(this.children)) {
+        result.push(coro.resume())
+      }
+      if (!fnAlive(this.children)) return result
+      yield result
+    }
+  }
+
+}
+
+/**
+ * Create a new coroutine to iterate all `coroutines` concurrently.
+ * This coroutine will never die.
+ *
+ * Additional coroutines can be added by `add<T>()`.
+ * Dead coroutines will be removed automatically.
+ *
+ * @param coroutines Coroutines or iterators
+ * @returns Composed coroutine
+ */
+export function concurrent<T> (coroutines: Coroutinizable<T>[]): ComposedCoroutine<T> {
+  return new ComposedCoroutine(
+    coroutines.map(c => create(c)),
+    (children: Coroutine<T>[]): boolean => {
+      for (let i = children.length - 1; 0 <= i; i--) {
+        if (!children[i].isAlive) children.splice(i, 1)
+      }
+      return true
+    }
+  )
+}
+
+/**
  * Create a new coroutine to iterate all `coroutines`
  * concurrently until the all of them are dead.
  *
  * @param coroutines Coroutines or iterators
  * @returns Composed coroutine
  */
-export function all<T> (coroutines: Coroutinizable<T>[]): Coroutine<T[]> {
-  return new Coroutine(function* (coroutines: Coroutine<T>[]): Iterator<T[]> {
-    while (true) {
-      let isAlive = false
-      const result = []
-      for (let coro of coroutines) {
-        result.push(coro.resume())
-        if (coro.isAlive) {
-          isAlive = true
-        }
+export function all<T> (coroutines: Coroutinizable<T>[]): ComposedCoroutine<T> {
+  return new ComposedCoroutine(
+    coroutines.map(c => create(c)),
+    (children: Coroutine<T>[]): boolean => {
+      for (let coro of children) {
+        if (coro.isAlive) return true
       }
-      if (!isAlive) {
-        return result
-      }
-      yield result
+      return false
     }
-  }(coroutines.map(c => create(c))))
+  )
 }
 
 /**
@@ -271,23 +331,17 @@ export function all<T> (coroutines: Coroutinizable<T>[]): Coroutine<T[]> {
  * @param coroutines Coroutines or iterators
  * @returns Composed coroutine
  */
-export function race<T> (coroutines: (Coroutinizable<T>)[]): Coroutine<T[]> {
-  return new Coroutine(function* (coros: Coroutine<T>[]): Iterator<T[]> {
-    while (true) {
-      let isAlive = true
-      const result = []
-      for (let coro of coros) {
-        result.push(coro.resume())
-        if (!coro.isAlive) {
-          isAlive = false
-        }
+export function race<T> (coroutines: (Coroutinizable<T>)[]): ComposedCoroutine<T> {
+  return new ComposedCoroutine(
+    coroutines.map(c => create(c)),
+    (children: Coroutine<T>[]): boolean => {
+      if (children.length === 0) return false
+      for (let coro of children) {
+        if (!coro.isAlive) return false
       }
-      if (!isAlive) {
-        return result
-      }
-      yield result
+      return true
     }
-  }(coroutines.map(c => create(c))))
+  )
 }
 
 /**

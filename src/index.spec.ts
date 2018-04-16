@@ -139,15 +139,56 @@ const generators = [
   }
 ]
 
+describe('Coroutine created by "concurrent"', () => {
+
+  it('runs well', () => {
+    const c = luacoro.concurrent(generators.map(g => luacoro.create(g())))
+    const actual = []
+    for (let i = 0; c.isAlive && i < 9; i++) {
+      if (i === 2) {
+        c.add(function* (): Iterator<string> {
+          yield 'x'
+          yield 'y'
+          return 'z'
+        })
+      }
+      if (i === 4) {
+        c.add(function* (): Iterator<string> {
+          return '!'
+        })
+        c.add(function* (): Iterator<string> {
+          yield 'X'
+          yield 'Y'
+          return 'Z'
+        })
+      }
+      if (i === 8) {
+        c.add(function* (): Iterator<string> {
+          return '?'
+        })
+      }
+      actual.push(c.resume().map(s => s || '-').join(''))
+    }
+    expect(actual.join(' ')).toEqual('aA1 bB Cx y z!X Y Z  ?')
+  })
+
+})
+
 describe('Coroutine created by "all"', () => {
 
   it('runs until the all iterators are dead', () => {
     const c = luacoro.all(generators.map(g => luacoro.create(g())))
     const actual = []
-    while (c.isAlive) {
+    for (let i = 0; c.isAlive; i++) {
+      if (i === 2) {
+        c.add(function* (): Iterator<string> {
+          yield 'X'
+          return 'Y'
+        })
+      }
       actual.push(c.resume().map(s => s || '-').join(''))
     }
-    expect(actual.join(' ')).toEqual('aA1 bB- -C-')
+    expect(actual.join(' ')).toEqual('aA1 bB- -C-X ---Y')
   })
 
 })
