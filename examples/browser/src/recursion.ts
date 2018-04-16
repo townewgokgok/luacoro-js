@@ -40,7 +40,7 @@ export function start () {
     ctx.moveTo(from.x, from.y)
     ctx.lineTo(to.x, to.y)
     ctx.stroke()
-    info.textContent = `frame: ${frame} / position: (${Math.round(to.x)}, ${Math.round(to.y)})`
+    info.textContent = `frame: ${frame} / pos: (${Math.round(to.x)}, ${Math.round(to.y)})`
     frame++
   }
 
