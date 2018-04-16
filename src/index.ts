@@ -309,6 +309,9 @@ export function concurrent<T> (coroutines: Coroutinizable<T>[]): ComposedCorouti
  * Create a new coroutine to iterate all `coroutines`
  * concurrently until the all of them are dead.
  *
+ * Dead coroutines will not be removed to keep array indexes of the `yield`ed value.
+ * Adding coroutines by `add<T>()` is discouraged.
+ *
  * @param coroutines Coroutines or iterators
  * @returns Composed coroutine
  */
@@ -327,6 +330,9 @@ export function all<T> (coroutines: Coroutinizable<T>[]): ComposedCoroutine<T> {
 /**
  * Create a new coroutine to iterate all `coroutines`
  * concurrently until one of them is dead.
+ *
+ * Array indexes of the `yield`ed value will be keeped.
+ * Adding coroutines by `add<T>()` is discouraged.
  *
  * @param coroutines Coroutines or iterators
  * @returns Composed coroutine
