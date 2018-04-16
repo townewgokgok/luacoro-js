@@ -66,7 +66,7 @@ export function start () {
     blueSprite.repaint(ctx)
   }
 
-  const coro = luacoro.all([
+  const coro = luacoro.concurrent([
     luacoro.forever(redSprite.goRound.bind(redSprite)),
     luacoro.forever(blueSprite.backAndForth.bind(blueSprite))
   ])

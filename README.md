@@ -170,7 +170,7 @@ class Sprite {
 const redSprite = new Sprite('red', topLeft)
 const blueSprite = new Sprite('blue', topLeft)
 
-const coro = luacoro.all([
+const coro = luacoro.concurrent([
   luacoro.forever(redSprite.goRound.bind(redSprite)),
   luacoro.forever(blueSprite.backAndForth.bind(blueSprite))
 ])
@@ -268,6 +268,7 @@ function* guide (): luacoro.Iterator<{}> {
   yield waitFrames
   yield moveTo(getElementPos('guide-open'))
   yield waitFrames
+  addClickEffect()
   showSettingsDialog()
   message('The settings dialog is appeared.')
   yield longWaitFrames
@@ -277,6 +278,7 @@ function* guide (): luacoro.Iterator<{}> {
   yield moveTo(getElementPos('guide-form-title', .9))
   yield waitFrames
   const title = exampleTitles[trial % exampleTitles.length]
+  addClickEffect()
   yield inputText('guide-form-title', title, () => updateTitle())
   yield waitFrames
 
@@ -293,6 +295,7 @@ function* guide (): luacoro.Iterator<{}> {
   yield waitFrames
   yield moveTo(getElementPos('guide-form-ok'))
   yield waitFrames
+  addClickEffect()
   hideSettingsDialog()
   yield longWaitFrames
 
@@ -341,45 +344,28 @@ Useful to clean up scene scoped resources.
 Defer functions must be normal functions.
 Not `yield`able within them.
 
-See [src/index.spec.ts](./src/index.spec.ts#L193-L228)
+See [examples/browser/src/guide.ts](./examples/browser/src/guide.ts#L199-L217) for example.
 
 ```typescript
-function* sub (out: string[]) {
-  luacoro.defer(() => out.push('sd'))
-  out.push('s')
-}
+function addClickEffect () {
+  coro.add(function* (): luacoro.Iterator<{}> {
+    const e = document.createElement('div')
+    e.classList.add('guide-click-effect')
+    document.getElementById('guide').appendChild(e)
+    luacoro.defer(() => {
+      e.remove()
+    })
+    e.style.left = `${lastCursorPos.x}px`
+    e.style.top = `${lastCursorPos.y}px`
 
-function* main (i: number, out: string[]) {
-  luacoro.defer(() => out.push('d1'))
-  out.push('1')
-  if (i === 0) return
-  yield sub(out)
-  if (i === 1) throw new Error('error')
-  luacoro.defer(() => out.push('d2'))
-  out.push('2')
+    for (let i = 1; i <= clickEffectFrames; i++) {
+      const s = easingOut(i / clickEffectFrames)
+      e.style.transform = `translate(-50%, -50%) scale(${s}, ${s})`
+      e.style.opacity = `${1 - s}`
+      yield
+    }
+  })
 }
-
-function* test () {
-  const result = []
-  yield main(0, result)
-  yield result.join(' ')
-  result.push('|')
-  try {
-    yield main(1, result)
-  } catch (e) {
-    yield result.join(' ')
-    result.push('|')
-  }
-  yield main(2, result)
-  return result.join(' ')
-}
-
-it('works', () => {
-  const c = luacoro.create(test())
-  expect(c.resume()).toEqual('1 d1')
-  expect(c.resume()).toEqual('1 d1 | 1 s sd d1')
-  expect(c.resume()).toEqual('1 d1 | 1 s sd d1 | 1 s sd 2 d2 d1')
-})
 ```
 
 ## Functions
