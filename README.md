@@ -59,7 +59,7 @@ const luacoro = require('luacoro')
 
 ## Examples
 
-See [src/examples/browser/](./src/examples/browser/).
+See [examples/browser/src/](./examples/browser/src/).
 
 Example code is also displayed in the [demo](https://townewgokgok.github.io/luacoro-js/).
 
