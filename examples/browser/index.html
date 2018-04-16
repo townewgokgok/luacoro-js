@@ -55,6 +55,10 @@
 
       .example {
         display: none;
+        position: relative;
+      }
+      .example > * {
+        position: absolute;
       }
       .example.visible {
         display: block;
@@ -64,14 +68,16 @@
         padding: .5em 1em;
       }
       #basic-textarea {
-        width: 21em;
-        height: 10em;
+        width: 300px;
+        height: 300px;
+        resize: none;
       }
-      #inn {
-        min-height: 20em;
+      #inn-content {
+        width: 500px;
+        height: 20em;
         border: 1px solid black;
       }
-      #inn.showCursor > *:last-child:after {
+      #inn-content.showCursor > *:last-child:after {
         content: ' ▼';
       }
       #guide {
@@ -158,6 +164,23 @@
         border-radius: 50%;
         transform-origin: center;
       }
+
+      .gist-it-gist {
+        left: 520px;
+      }
+      #basic .gist-it-gist {
+        left: 320px;
+      }
+      #concurrent .gist-it-gist {
+        left: 320px;
+      }
+      #recursion .gist-it-gist {
+        left: 320px;
+      }
+      .gist-it-gist .gist-file .gist-data, .gister-gist .gist-file .gist-data {
+        background-color: #f8f8f8 !important;
+        font-size: 80% !important;
+      }
     </style>
   </head>
   <body>
@@ -165,15 +188,20 @@
     <br/>
     <div class="example" id="basic">
       <textarea id="basic-textarea"></textarea>
+      <script src="http://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/basic.ts"></script>
     </div>
     <div class="example" id="concurrent">
       <canvas id="concurrent-canvas"></canvas>
+      <script src="http://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/concurrent.ts"></script>
     </div>
     <div class="example" id="recursion">
       <div id="recursion-info"></div>
       <canvas id="recursion-canvas"></canvas>
+      <script src="http://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/recursion.ts"></script>
     </div>
     <div class="example" id="inn">
+      <div id="inn-content"></div>
+      <script src="http://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/inn.ts?slice=126:"></script>
     </div>
     <div class="example" id="guide">
       <div id="guide-preview">
@@ -210,6 +238,7 @@
       <div id="guide-cursor">
         <img src="src/assets/navigate.svg"/>
       </div>
+      <script src="http://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/guide.ts?slice=218:"></script>
     </div>
     <script src="./src/index.ts"></script>
   </body>

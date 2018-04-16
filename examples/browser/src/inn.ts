@@ -17,14 +17,14 @@ window.addEventListener('keydown', (e: KeyboardEvent) => {
 
 let luminance: number
 function updateLuminance () {
-  const e = document.getElementById('inn')
+  const e = document.getElementById('inn-content')
   e.style.background = `rgb(${luminance}, ${luminance}, ${luminance})`
 }
 
 function message (msg: string) {
   const e = document.createElement('div') as HTMLDivElement
   e.textContent = msg
-  document.getElementById('inn').appendChild(e)
+  document.getElementById('inn-content').appendChild(e)
 }
 
 let waitingFrames: number
@@ -38,7 +38,7 @@ export function start () {
   luminance = 255
   updateLuminance()
   waitingFrames = 0
-  document.getElementById('inn').innerHTML = ''
+  document.getElementById('inn-content').innerHTML = ''
 
   let coro = luacoro.create(inn())
   let frame = 0
@@ -47,7 +47,7 @@ export function start () {
     request = null
 
     let r
-    const e = document.getElementById('inn')
+    const e = document.getElementById('inn-content')
     e.classList.remove('showCursor')
     switch (mode) {
       case 'waitKey':
