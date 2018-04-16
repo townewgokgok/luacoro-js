@@ -4,12 +4,55 @@
     <meta charset="utf-8" />
     <title>luacoro-js browser examples</title>
     <style type="text/css">
-      body, textarea, button {
+      * {
+        box-sizing: border-box;
+      }
+      body, textarea, button, input {
         font-family: Menlo, "Lucida Console", Courier, monospace;
       }
       textarea {
         font-size: 16px;
       }
+      hr {
+        border: none;
+        border-top: 1px dashed black;
+      }
+      button {
+        background: #3366ff;
+        color: white;
+        border: none;
+        outline: none;
+      }
+      button:hover, button.hover {
+        background: #6699ff;
+      }
+      button:active, button.active {
+        background: #99ccff;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #c7c7c7;
+        height: 2px;
+        width: 128px;
+      }
+      input[type="range"]:focus, input[type="range"]:active {
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        position: relative;
+        border: none;
+        width: 12px;
+        height: 12px;
+        display: block;
+        background-color: #262626;
+        border-radius: 50%;
+        -webkit-border-radius: 50%;
+      }
+
       .example {
         display: none;
       }
@@ -31,6 +74,86 @@
       #inn.showCursor > *:last-child:after {
         content: ' ▼';
       }
+      #guide {
+        position: relative;
+        width: 500px;
+        height: 500px;
+        background: #eeeeee;
+        padding: 0;
+      }
+      #guide h1 {
+        margin: 0;
+      }
+      #guide-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgb(255, 255, 128);
+        padding: .5em 1em;
+      }
+      #guide-open {
+        float: right;
+        opacity: .5;
+      }
+      #guide-open:hover, #guide-open.hover {
+        opacity: 1.0;
+      }
+      #guide-dialog {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        box-shadow: 0 0 16px rgba(0,0,0,.5);
+        padding: 1em 1.5em;
+        z-index: 100;
+        display: none;
+      }
+      #guide-dialog h3 {
+        margin-top: 0;
+      }
+      #guide-form {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      #guide-form th, #guide-form td {
+        border: 1px solid black;
+        padding: .5em 1em;
+      }
+      #guide-form-buttons {
+        position: relative;
+        margin-top: 1em;
+        width: 100%;
+        text-align: right;
+      }
+      #guide-form-buttons button {
+        padding: .5em 2em;
+      }
+      #guide-message {
+        position: absolute;
+        width: 80%;
+        left: 50%;
+        bottom: 1em;
+        transform: translate(-50%, 0);
+        padding: .5em 1em;
+        background: white;
+        border: 1px solid black;
+        z-index: 500;
+        display: none;
+      }
+      #guide-cursor {
+        display: none;
+        position: fixed;
+        transform: scale(-1, 1);
+        z-index: 1000;
+      }
+      #guide-cursor svg {
+        fill: white;
+        stroke: black;
+        stroke-width: 16;
+      }
     </style>
   </head>
   <body>
@@ -47,6 +170,52 @@
       <canvas id="recursion-canvas"></canvas>
     </div>
     <div class="example" id="inn">
+    </div>
+    <div class="example" id="guide">
+      <div id="guide-preview">
+        <a href="#" id="guide-open" onclick="return false">
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            width="64px" height="64px" viewBox="0 0 512 512" xml:space="preserve">
+            <path d="M448,294.4v-76.8h-42.8c-3.4-14.4-8.9-28-16.1-40.5l29.8-29.7l-54.3-54.3l-29.1,29.1c-12.6-7.7-26.4-13.5-41.1-17.3V64
+            h-76.8v40.9c-14.7,3.8-28.5,9.7-41.1,17.3l-29.1-29.1l-54.3,54.3l29.8,29.7c-7.2,12.5-12.6,26.1-16.1,40.5H64v76.8h44.1
+            c3.8,13.7,9.5,26.6,16.7,38.6l-31.7,31.7l54.3,54.3l32.3-32.3c11.7,6.8,24.5,11.9,37.9,15.4v46h76.8v-46
+            c13.5-3.5,26.2-8.6,37.9-15.4l32.3,32.3l54.3-54.3L387.3,333c7.2-11.9,12.9-24.8,16.7-38.6H448z M256,309.8
+            c-29.7,0-53.7-24.1-53.7-53.8s24-53.8,53.7-53.8s53.8,24.1,53.8,53.8S285.7,309.8,256,309.8z" />
+          </svg>
+        </a>
+        <h1 id="guide-preview-title">My diary</h1>
+        <hr/>
+        This is an example.<br/>
+        This is an example.<br/>
+        This is an example.
+      </div>
+      <div id="guide-dialog">
+        <h3>Page settings</h3>
+        <table id="guide-form">
+          <tr>
+            <th>Title</th>
+            <td><input id="guide-form-title" type="text" maxlength="100" value="My blog" /></td>
+          </tr>
+          <tr>
+            <th>Color</th>
+            <td nowrap>
+              R <input id="guide-form-color-r" type="range" min="0" max="255" value="255" /><br/>
+              G <input id="guide-form-color-g" type="range" min="0" max="255" value="255" /><br/>
+              B <input id="guide-form-color-b" type="range" min="0" max="255" value="128" />
+            </td>
+          </tr>
+        </table>
+        <div id="guide-form-buttons">
+          <button id="guide-form-ok">O K</button>
+        </div>
+      </div>
+      <div id="guide-message"></div>
+      <div id="guide-cursor">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          width="24px" height="24px" viewBox="0 0 512 512" xml:space="preserve">
+          <polygon points="480,32 32,224 288,224 288,480 "/>
+        </svg>
+      </div>
     </div>
     <script src="./src/index.ts"></script>
   </body>

@@ -30,6 +30,7 @@ TOC
     - [Concurrent](#concurrent)
     - [Recursion](#recursion)
     - [Inn (something like an RPG scenario)](#inn-something-like-an-rpg-scenario)
+    - [Guide (Form input operation demo)](#guide-form-input-operation-demo)
 - [Error handling](#error-handling)
 - [Golang-like defer](#golang-like-defer)
 - [Functions](#functions)
@@ -246,6 +247,53 @@ function* inn (): luacoro.Iterator<string> {
 
   message('I shall see thee again.')
   yield waitKey()
+}
+```
+
+### Guide (Form input operation demo)
+
+Source: [examples/browser/src/guide.ts](./examples/browser/src/guide.ts)
+
+```typescript
+function* guide (): luacoro.Iterator<{}> {
+  reset()
+  setCursorPos(getElementPos('guide'))
+  showCursor()
+  yield waitFrames
+
+  message('To customize theme, click the gear icon at top-right.')
+  yield waitFrames
+  yield moveTo(getElementPos('guide-open'))
+  yield waitFrames
+  showSettingsDialog()
+  message('The settings dialog is appeared.')
+  yield longWaitFrames
+
+  message('Input your blog title.')
+  yield waitFrames
+  yield moveTo(getElementPos('guide-form-title', .9))
+  yield waitFrames
+  const title = exampleTitles[trial % exampleTitles.length]
+  yield inputText('guide-form-title', title, () => updateTitle())
+  yield waitFrames
+
+  message('Change background color.')
+  yield waitFrames
+  const color = exampleColors[trial % exampleColors.length]
+  yield moveSlider('guide-form-color-r', color[0], () => updateBgColor())
+  yield moveSlider('guide-form-color-g', color[1], () => updateBgColor())
+  yield moveSlider('guide-form-color-b', color[2], () => updateBgColor())
+  trial++
+  yield waitFrames
+
+  message('Click "OK" button.')
+  yield waitFrames
+  yield moveTo(getElementPos('guide-form-ok'))
+  yield waitFrames
+  hideSettingsDialog()
+  yield longWaitFrames
+
+  reset()
 }
 ```
 

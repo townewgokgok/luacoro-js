@@ -2,6 +2,7 @@ import * as basic from './basic'
 import * as concurrent from './concurrent'
 import * as recursion from './recursion'
 import * as inn from './inn'
+import * as guide from './guide'
 
 interface Demo {
   start (): void
@@ -12,7 +13,8 @@ const examples: {[name: string]: Demo} = {
   basic,
   concurrent,
   recursion,
-  inn
+  inn,
+  guide
 }
 
 const buttons = document.getElementById('buttons') as HTMLDivElement

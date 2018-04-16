@@ -43,4 +43,11 @@ export default class Vector {
       this.x * s + this.y * c
     )
   }
+
+  lerp (v: Vector, r: number): Vector {
+    return new Vector(
+      this.x * (1 - r) + v.x * r,
+      this.y * (1 - r) + v.y * r
+    )
+  }
 }
