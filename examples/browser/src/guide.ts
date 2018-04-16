@@ -1,17 +1,15 @@
 import * as luacoro from 'luacoro'
 import Vector from './vector'
-import BezierEasing from 'bezier-easing'
 
 let request: number = null
+let coro: luacoro.ComposedCoroutine<{}>
 
 export function start () {
-  let coro = luacoro.create(guide())
+  coro = luacoro.concurrent([ guide() ])
 
   function update () {
     coro.resume()
-    if (coro.isAlive) {
-      request = requestAnimationFrame(update)
-    }
+    request = requestAnimationFrame(update)
   }
 
   request = requestAnimationFrame(update)
@@ -20,6 +18,7 @@ export function start () {
 export function stop () {
   if (request) cancelAnimationFrame(request)
   request = null
+  coro = null
   reset()
 }
 
@@ -131,6 +130,19 @@ function message (msg: string) {
   e.style.display = 'block'
 }
 
+function easingIn (v: number): number {
+  return v * v * v
+}
+
+function easingOut (v: number): number {
+  return 1 - easingIn(1 - v)
+}
+
+function easingInOut (v: number): number {
+  if (.5 < v) return 1 - easingInOut(1 - v)
+  return easingIn(v * 2) * .5
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // Guide implementations
 
@@ -140,6 +152,7 @@ const baseMoveFrames = 15
 const moveFramesPerDistance = .15
 const beforeTypeFrames = 20
 const typeFrames = 4
+const clickEffectFrames = 30
 const exampleTitles = [
   'JavaScript tutorial',
   'My diary'
@@ -151,12 +164,11 @@ const exampleColors = [
 let trial = 0
 
 function *moveTo (to: Vector, fn?: (r: number, p: Vector) => void): luacoro.Iterator<{}> {
-  const easing = BezierEasing(0.42, 0, 0.58, 1.0)
   const from = lastCursorPos.clone()
   const distance = to.sub(from).size()
   const frames = baseMoveFrames + distance * moveFramesPerDistance
   for (let i = 0; i < frames; i++) {
-    const r = easing(i / (frames - 1))
+    const r = easingInOut(i / (frames - 1))
     const p = from.lerp(to, r)
     setCursorPos(p)
     if (fn) fn(r, p)
@@ -184,6 +196,26 @@ function *inputText (id: string, text: string, fn?: (e: HTMLInputElement, text: 
   }
 }
 
+function addClickEffect () {
+  coro.add(function* (): luacoro.Iterator<{}> {
+    const e = document.createElement('div')
+    e.classList.add('guide-click-effect')
+    document.getElementById('guide').appendChild(e)
+    luacoro.defer(() => {
+      e.remove()
+    })
+    e.style.left = `${lastCursorPos.x}px`
+    e.style.top = `${lastCursorPos.y}px`
+
+    for (let i = 1; i <= clickEffectFrames; i++) {
+      const s = easingOut(i / clickEffectFrames)
+      e.style.transform = `translate(-50%, -50%) scale(${s}, ${s})`
+      e.style.opacity = `${1 - s}`
+      yield
+    }
+  })
+}
+
 function* guide (): luacoro.Iterator<{}> {
   reset()
   setCursorPos(getElementPos('guide'))
@@ -194,6 +226,7 @@ function* guide (): luacoro.Iterator<{}> {
   yield waitFrames
   yield moveTo(getElementPos('guide-open'))
   yield waitFrames
+  addClickEffect()
   showSettingsDialog()
   message('The settings dialog is appeared.')
   yield longWaitFrames
@@ -203,6 +236,7 @@ function* guide (): luacoro.Iterator<{}> {
   yield moveTo(getElementPos('guide-form-title', .9))
   yield waitFrames
   const title = exampleTitles[trial % exampleTitles.length]
+  addClickEffect()
   yield inputText('guide-form-title', title, () => updateTitle())
   yield waitFrames
 
@@ -219,10 +253,9 @@ function* guide (): luacoro.Iterator<{}> {
   yield waitFrames
   yield moveTo(getElementPos('guide-form-ok'))
   yield waitFrames
+  addClickEffect()
   hideSettingsDialog()
   yield longWaitFrames
 
   reset()
 }
-
-(window as any).BezierEasing = BezierEasing
