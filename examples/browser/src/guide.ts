@@ -70,7 +70,12 @@ function reset () {
 }
 
 function updateHover (p: Vector, isFocused: boolean) {
-  let e = document.elementFromPoint(p.x, p.y)
+  const revert = disableBlockerTemp()
+  let e = document.elementFromPoint(
+    p.x - window.pageXOffset,
+    p.y - window.pageYOffset
+  )
+  revert()
   while (e && e.id !== 'guide') {
     if (isFocused) {
       e.classList.add('hover')
@@ -121,9 +126,11 @@ function setSliderPos (id: string, x: number) {
 
 let lastCursorPos: Vector = null
 function setCursorPos (pos: Vector) {
+  const p0 = getElementPos('guide', 0, 0)
+  const p = pos.sub(p0)
   const e = document.getElementById('guide-cursor') as HTMLElement
-  e.style.left = `${pos.x}px`
-  e.style.top = `${pos.y}px`
+  e.style.left = `${p.x}px`
+  e.style.top = `${p.y}px`
   if (lastCursorPos) updateHover(lastCursorPos, false)
   updateHover(pos, true)
   lastCursorPos = pos.clone()
@@ -143,6 +150,15 @@ function enableBlocker () {
 function disableBlocker () {
   const e = document.getElementById('guide-blocker') as HTMLDivElement
   e.style.display = 'none'
+}
+
+function disableBlockerTemp () {
+  const e = document.getElementById('guide-blocker') as HTMLDivElement
+  const d = e.style.display
+  e.style.display = 'none'
+  return function () {
+    e.style.display = d
+  }
 }
 
 function easingIn (v: number): number {
@@ -225,14 +241,17 @@ function *inputText (id: string, text: string, fn?: (e: HTMLInputElement, text: 
 
 function addClickEffect () {
   coro.add(function* (): luacoro.Iterator<{}> {
+    const p0 = getElementPos('guide', 0, 0)
+    const p = lastCursorPos.sub(p0)
+
     const e = document.createElement('div')
     e.classList.add('guide-click-effect')
     document.getElementById('guide').appendChild(e)
     luacoro.defer(() => {
       e.remove()
     })
-    e.style.left = `${lastCursorPos.x}px`
-    e.style.top = `${lastCursorPos.y}px`
+    e.style.left = `${p.x}px`
+    e.style.top = `${p.y}px`
 
     for (let i = 1; i <= clickEffectFrames; i++) {
       const s = easingOut(i / clickEffectFrames)
