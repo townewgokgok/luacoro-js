@@ -2,6 +2,7 @@ import * as inn from './inn'
 import * as guide from './guide'
 import * as basic from './basic'
 import * as concurrent from './concurrent'
+import * as coffeebreak from './coffeebreak'
 import * as recursion from './recursion'
 
 interface Demo {
@@ -14,6 +15,7 @@ const examples: {[name: string]: Demo} = {
   guide,
   basic,
   concurrent,
+  coffeebreak,
   recursion
 }
 
