@@ -63,3 +63,4 @@ function onHashChange () {
 }
 window.addEventListener('hashchange', onHashChange)
 onHashChange()
+document.getElementById('loading').remove()
