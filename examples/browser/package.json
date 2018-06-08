@@ -4,7 +4,8 @@
   "scripts": {
     "start": "./node_modules/.bin/parcel index.html",
     "clean": "rm -f dist/*.{svg,png,html,js,map}",
-    "build": "rm -Rf dist && ./node_modules/.bin/parcel build --public-url 'https://townewgokgok.github.io/luacoro-js/' index.html"
+    "prebuild": "npm run clean",
+    "build": "./node_modules/.bin/parcel build --public-url 'https://townewgokgok.github.io/luacoro-js/' index.html"
   },
   "author": "townewgokgok <townewgokgok@gmail.com>",
   "license": "MIT",
