@@ -185,11 +185,11 @@
       #concurrent .gist-it-gist {
         left: 320px;
       }
-      #coffeebreak-container {
+      .coffeebreak-container {
         width: 512px;
         height: 144px;
       }
-      #coffeebreak-content {
+      .coffeebreak-content {
         width: 256px;
         height: 72px;
         position: relative;
@@ -202,7 +202,7 @@
         image-rendering: -moz-crisp-edges;
         image-rendering: pixelated;
       }
-      #coffeebreak-content * {
+      .coffeebreak-content * {
         position: absolute;
       }
       #recursion .gist-it-gist {
@@ -217,30 +217,36 @@
   <body>
     <div id="buttons"></div>
     <br/>
-    <div class="example" id="basic">
+    <div class="example" id="example-basic">
       <textarea id="basic-textarea"></textarea>
       <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/basic.ts"></script>
     </div>
-    <div class="example" id="concurrent">
+    <div class="example" id="example-concurrent">
       <canvas id="concurrent-canvas"></canvas>
       <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/concurrent.ts"></script>
     </div>
-    <div class="example" id="coffeebreak">
-      <div id="coffeebreak-container">
-        <div id="coffeebreak-content"></div>
+    <div class="example" id="example-coffeebreak1">
+      <div class="coffeebreak-container">
+        <div class="coffeebreak-content" id="coffeebreak1-content"></div>
       </div>
-      <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/coffeebreak.ts?slice=17:75"></script>
+      <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/coffeebreak1.ts?slice=17:75"></script>
     </div>
-    <div class="example" id="recursion">
+    <div class="example" id="example-coffeebreak2">
+      <div class="coffeebreak-container">
+        <div class="coffeebreak-content" id="coffeebreak2-content"></div>
+      </div>
+      <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/coffeebreak2.ts?slice=87:247"></script>
+    </div>
+    <div class="example" id="example-recursion">
       <canvas id="recursion-canvas"></canvas>
       <div id="recursion-info"></div>
       <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/recursion.ts"></script>
     </div>
-    <div class="example" id="inn">
+    <div class="example" id="example-inn">
       <div id="inn-content"></div>
       <script src="https://gist-it.appspot.com/github/townewgokgok/luacoro-js/raw/master/examples/browser/src/inn.ts?slice=126:"></script>
     </div>
-    <div class="example" id="guide">
+    <div class="example" id="example-guide">
       <div id="guide-preview">
         <a href="#" id="guide-open" onclick="return false">
           <img src="src/assets/gear-b.svg"/>

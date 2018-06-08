@@ -2,7 +2,8 @@ import * as inn from './inn'
 import * as guide from './guide'
 import * as basic from './basic'
 import * as concurrent from './concurrent'
-import * as coffeebreak from './coffeebreak'
+import * as coffeebreak1 from './coffeebreak1'
+import * as coffeebreak2 from './coffeebreak2'
 import * as recursion from './recursion'
 
 interface Demo {
@@ -11,11 +12,12 @@ interface Demo {
 }
 
 const examples: {[name: string]: Demo} = {
+  coffeebreak1,
+  coffeebreak2,
   inn,
   guide,
   basic,
   concurrent,
-  coffeebreak,
   recursion
 }
 
@@ -42,7 +44,7 @@ function startDemo (name: string) {
   for (let i = 0; i < divs.length; i++) {
     divs[i].classList.remove('visible')
   }
-  document.getElementById(name).classList.add('visible')
+  document.getElementById('example-' + name).classList.add('visible')
   if (currentDemo) currentDemo.stop()
   demo.start()
   currentDemo = demo

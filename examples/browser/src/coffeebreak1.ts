@@ -77,7 +77,7 @@ function* awardBonus (): luacoro.Iterator<{}> {
 let request: number = null
 
 export function start () {
-  stage = document.getElementById('coffeebreak-content') as HTMLDivElement
+  stage = document.getElementById('coffeebreak1-content') as HTMLDivElement
   const coro = new luacoro.Coroutine(awardBonus())
   function update () {
     coro.resume()
