@@ -15,8 +15,6 @@ import bg_misc_dot from './assets/bg_misc-dot.png'
 import bg_misc_sweat from './assets/bg_misc-sweat.png'
 
 let stage: HTMLDivElement
-let bgLayer: HTMLDivElement
-let effectLayer: HTMLDivElement
 
 class Sprite {
 
@@ -150,7 +148,7 @@ export default function* dotEater (): luacoro.Iterator<{}> {
     if (0 <= x && x % pitch === 0) {
       const dot = new Sprite(bg_misc_dot)
       dots.push(dot)
-      bgLayer.appendChild(dot.el)
+      stage.appendChild(dot.el)
       dot.x = player.x
       dot.y = y0 + dy
       if (x === stage.clientWidth * 3 >> 2) {
@@ -176,7 +174,7 @@ export default function* dotEater (): luacoro.Iterator<{}> {
     player.el.src = f ? sprites_ai_run_1 : sprites_ai_run_0
     if ((x + 4) % pitch === 0) {
       const dot = dots.shift()
-      bgLayer.removeChild(dot.el)
+      stage.removeChild(dot.el)
       if (dot === takoyaki) {
         takoyaki = null
         break
@@ -234,7 +232,7 @@ export default function* dotEater (): luacoro.Iterator<{}> {
   yield 15
 
   const sweat = new Sprite(bg_misc_sweat)
-  effectLayer.appendChild(sweat.el)
+  stage.appendChild(sweat.el)
   sweat.x = player.x + 16
   sweat.y = player.y - 50
   sweat.scaleX = -2
@@ -250,8 +248,6 @@ let request: number = null
 
 export function start () {
   stage = document.getElementById('coffeebreak2-content') as HTMLDivElement
-  bgLayer = stage
-  effectLayer = stage
   const coro = new luacoro.Coroutine(dotEater())
   function update () {
     coro.resume()
