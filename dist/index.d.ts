@@ -36,8 +36,8 @@ export declare class Coroutine<T> {
      */
     resume(resumeValue?: T): T;
     protected pushIterator(iter?: Iterator<T>): void;
-    private defer(fn);
-    private popStack();
+    private defer;
+    private popStack;
 }
 /**
  * Register `fn` to be invoked when exiting the caller iterator.
@@ -103,7 +103,7 @@ export declare class ComposedCoroutine<T> extends Coroutine<T[]> {
      * @param c Coroutine or iterator
      */
     add(coroutine: Coroutinizable<T>): void;
-    private main(fnAlive);
+    private main;
 }
 /**
  * Create a new coroutine to iterate all `coroutines` concurrently.
