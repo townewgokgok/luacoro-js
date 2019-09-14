@@ -1,6 +1,6 @@
 {
   "name": "luacoro",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Lua-like pseudo-coroutine that wraps iterators.",
   "keywords": [
     "coroutine",
@@ -34,7 +34,7 @@
     "karma-typescript": "^4.1.0",
     "tslint": "^5.17.0",
     "tslint-config-standard": "^7.1.0",
-    "typedoc": "^0.14.2",
+    "typedoc": "^0.15.0",
     "typescript": "^2.9.2"
   }
 }
